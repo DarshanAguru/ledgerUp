@@ -123,11 +123,7 @@ const InitialLayout = () => {
     {
       
         register()
-
-
-      
       //@ts-ignore
-
       router.replace('/(authenticated)/(modals)/lock');
     }
     else if(!isSignedIn)
