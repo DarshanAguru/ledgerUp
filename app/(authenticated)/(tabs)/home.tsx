@@ -55,7 +55,7 @@ const Page = () => {
           <Text style={[styles.balance, {color: (balance() < 0 )? "red" : Colors.dark}]}>{balance()}</Text>
 
         </View>
-        <Text style={{position: 'absolute',color: Colors.lightGray, fontSize: 38,alignSelf: 'center', top:50, letterSpacing:6,fontWeight: '500', opacity: 0.5}}>Balance</Text>
+        <Text style={{position: 'absolute',color: Colors.lightGray, fontSize: 36,alignSelf: 'center', top:50, letterSpacing:2,fontWeight: '500', opacity: 0.4}}>Balance</Text>
 
       </View>
       <View style={{flexDirection: 'column',alignItems: 'center', justifyContent: 'center'}}>
@@ -111,7 +111,7 @@ const Page = () => {
 
 const styles = StyleSheet.create({
 account : {
-  margin: 20,
+  margin: 25,
   alignItems: 'center'
 },
 

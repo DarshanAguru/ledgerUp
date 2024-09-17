@@ -23,11 +23,11 @@ const Layout = () => {
         }
         
     }>
-      <Tabs.Screen name="home"  options={{ title: "Home", tabBarIcon: ({size, color})=>(<FontAwesome name="home" size={size} color={color}/>), header: ()=><HeaderTabs tabName={'HOME'}/> }}/>
-      <Tabs.Screen name="history" options={ {title: "History", tabBarIcon: ({size, color})=>(<FontAwesome name="history" size={size} color={color}/>), header: ()=><HeaderTabs tabName={'HISTORY'}/> }}/>
-      <Tabs.Screen name="analysis" options={ {title: "Spends", tabBarIcon: ({size, color})=>(<FontAwesome name="pie-chart" size={size} color={color}/>), header: ()=><HeaderTabs tabName={'SPENDS'}/> }}/>
-      <Tabs.Screen name="lists" options={ {title: "Lists", tabBarIcon: ({size, color})=>(<FontAwesome name="list" size={size} color={color}/>), header: ()=><HeaderTabs tabName={'LISTS'}/> }}/>
-      <Tabs.Screen name="remainders" options={ {title: "Remainders", tabBarIcon: ({size, color})=>(<FontAwesome name="bell" size={size} color={color}/>), header: ()=><HeaderTabs tabName={'REMAINDERS'}/> }}/>
+      <Tabs.Screen name="home"  options={{ title: "Home", tabBarIcon: ({size, color})=>(<FontAwesome name="home" size={size} color={color}/>), header: ()=><HeaderTabs /> }}/>
+      <Tabs.Screen name="history" options={ {title: "History", tabBarIcon: ({size, color})=>(<FontAwesome name="history" size={size} color={color}/>), header: ()=><HeaderTabs /> }}/>
+      <Tabs.Screen name="analysis" options={ {title: "Spends", tabBarIcon: ({size, color})=>(<FontAwesome name="pie-chart" size={size} color={color}/>), header: ()=><HeaderTabs /> }}/>
+      <Tabs.Screen name="lists" options={ {title: "Lists", tabBarIcon: ({size, color})=>(<FontAwesome name="list" size={size} color={color}/>), header: ()=><HeaderTabs /> }}/>
+      <Tabs.Screen name="remainders" options={ {title: "Remainders", tabBarIcon: ({size, color})=>(<FontAwesome name="bell" size={size} color={color}/>), header: ()=><HeaderTabs /> }}/>
    </Tabs>
   )
 }

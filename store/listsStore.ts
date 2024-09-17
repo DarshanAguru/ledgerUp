@@ -17,7 +17,7 @@ export interface Lists {
     id: string;
     title: string;
     date: string;
-    category: "Weekly" | "Monthly" | "Groceries" | "Other" | "None";
+    category: "Weekly" | "Monthly" | string;
     listItems: Array<ListItem>;
     totalAmount: number;
     spentAmount: number;

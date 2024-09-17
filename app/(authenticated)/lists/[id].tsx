@@ -89,7 +89,8 @@ const Page = () => {
     useFocusEffect(useCallback(()=>{
 
         const totalAmount = listItems.reduce((prev:any,curr:any)=>(prev+curr.amount),0);
-        setAmounts((prev)=>({...prev, total: totalAmount}));
+        const totalSpent = listItems.filter((item:any)=>item.isChecked).reduce((prev:any,curr:any)=>(prev+curr.amount),0);
+        setAmounts((prev)=>({...prev, total: totalAmount, spent: totalSpent}));
     },[listItems]))
 
     const onAddItem = ()=>{
@@ -125,7 +126,7 @@ const Page = () => {
                     id: Math.random().toString() + "@"+ currDate,
                     amount: listItems[i].amount,
                     date: date.toDateString(),
-                    title: `${title} - ${listItems[i].data}` || `${category} - ${listItems[i].data}`,
+                    title: `${title} - ${listItems[i].data.split("++")[0]}` || `${category} - ${listItems[i].data.split("++")[0]}`,
                     type: "expense",
                     category: category,
                 });    
@@ -136,6 +137,12 @@ const Page = () => {
     
     const onSave = async()=>{
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    if(listItems.length === 0)
+    {
+        Toast.show("Please add at least one item to your list", Toast.SHORT);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        return;
+    }
     const completed = listItems.filter((item:any)=>item.isChecked === true).length === listItems.length;
 
     if(addedToTransactions)
@@ -165,7 +172,7 @@ const Page = () => {
                         id: id,
                         title: title,
                         date: `${date.getDate().toString().padStart(2,"0")}/${(date.getMonth()+1).toString().padStart(2,"0")}/${date.getFullYear().toString().padStart(4,"0")}, ${date.toString().split(' ')[0]}`,
-                        category: (category === "Weekly")?"Weekly":(category === "Monthly")?"Monthly":(category === "Groceries")?"Groceries":(category === "Other")?"Other":"None",
+                        category: (category === "Weekly")?"Weekly":(category === "Monthly")?"Monthly":(category !== "Other")?category:"Other",
                         listItems: listItems,
                         totalAmount: amounts.total,
                         spentAmount: amounts.spent,
@@ -187,7 +194,7 @@ const Page = () => {
                                 id: id,
                                 title: title,
                                 date: `${date.getDate().toString().padStart(2,"0")}/${(date.getMonth()+1).toString().padStart(2,"0")}/${date.getFullYear().toString().padStart(4,"0")}, ${date.toString().split(' ')[0]}`,
-                                category: (category === "Weekly")?"Weekly":(category === "Monthly")?"Monthly":(category === "Groceries")?"Groceries":(category === "Other")?"Other":"None",
+                                category: (category === "Weekly")?"Weekly":(category === "Monthly")?"Monthly":(category !== "Other")?category:"Other",
                                 listItems: listItems,
                                 totalAmount: amounts.total,
                                 spentAmount: amounts.spent,
@@ -212,7 +219,7 @@ const Page = () => {
         id: id,
         title: title,
         date: `${date.getDate().toString().padStart(2,"0")}/${(date.getMonth()+1).toString().padStart(2,"0")}/${date.getFullYear().toString().padStart(4,"0")}, ${date.toString().split(' ')[0]}`,
-        category: (category === "Weekly")?"Weekly":(category === "Monthly")?"Monthly":(category === "Groceries")?"Groceries":(category === "Other")?"Other":"None",
+        category: (category === "Weekly")?"Weekly":(category === "Monthly")?"Monthly":(category !== "Other")?category:"Other",
         listItems: listItems,
         totalAmount: amounts.total,
         spentAmount: amounts.spent,
@@ -242,23 +249,7 @@ const Page = () => {
 
     const HandleCheckChange = (id:string,isChecked:boolean)=>{
       Vibration.vibrate(10);
-      const item = listItems.find((item:any)=>item.id === id);
-      if(isChecked)
-      {
-        if(item.hasAmount)
-        {
-          setAmounts((prev)=>({...prev, spent: prev.spent-item.amount}));
-        }
-      }
-      else{
-
-        if(item.hasAmount)
-        {
-          setAmounts((prev)=>({...prev, spent: prev.spent+item.amount}));
-        }
-      }
       const lst = listItems.map((item:any)=>item.id === id?{...item, isChecked: !isChecked}:item);
-
       setListItems(lst);
   }
 

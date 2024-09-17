@@ -34,7 +34,7 @@ const Page = () => {
 
 
   
-  const [category,  setCategory] = useState("");
+  const [category,  setCategory] = useState("Other");
   const [recurring , setRecurring] = useState(false);
   const [title, setTitle] = useState("");
   const [date , setDate] = useState(new Date());
@@ -45,7 +45,7 @@ const Page = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   
   const [day, setDay] = useState(-1);
-  const [mdate, setMdate] = useState("");
+  const [mdate, setMdate] = useState(new Date().toISOString());
   const [categoriesData, setCategoryData] = useState<any>([]);
 
   const { getAllExpenseCats} = useCategoryStore();
@@ -91,10 +91,16 @@ const Page = () => {
       }    }
     
     const onSave = async()=>{
+      if(listItems.length === 0)
+      {
+          Toast.show("Please add at least one item to your list", Toast.SHORT);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          return;
+      }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const currDate=  new Date().toISOString();
-    const completed = listItems.filter((item:any)=>item.isChecked === true).length === listItems.length;
-    const titl = (category === "Weekly")? "Weekly Shopping List":(category === "Monthly")?"Monthly Shopping List":(category === "Groceries")?"Groceries Shopping List":(category === "Other")?"List":"Shopping List";
+    const completed = false;
+    const titl = (category === "Weekly")? "Weekly Shopping List":(category === "Monthly")?"Monthly Shopping List":"Shopping List";
     const id = (recurring)?"$r$"+Math.random().toString()+"&"+"List"+"&" + "@"+ currDate:Math.random().toString()+"&"+"List"+"&" + "@"+ currDate;
     let notifid = "";
     
@@ -115,7 +121,7 @@ const Page = () => {
         id: id,
         title: title || titl,
         date: `${date.getDate().toString().padStart(2,"0")}/${(date.getMonth()+1).toString().padStart(2,"0")}/${date.getFullYear().toString().padStart(4,"0")}, ${date.toString().split(' ')[0]}`,
-        category: (category === "Weekly")?"Weekly":(category === "Monthly")?"Monthly":(category === "Groceries")?"Groceries":(category === "Other")?"Other":"None",
+        category: (category === "Weekly")?"Weekly":(category === "Monthly")?"Monthly":(category!== "Other")?category:"Other",
         listItems: listItems,
         totalAmount: amounts.total,
         spentAmount: amounts.spent,
@@ -211,7 +217,7 @@ const Page = () => {
         <StatusBar style='dark'/>
         <View style={[styles.mainInputContainer, {gap: 10, marginBottom: 0}]}>
             <View style={[styles.inputContainer, {width: '100%'}]}>                
-              <TextInput style={[styles.input, {fontSize: 20,borderRadius: 12,padding: 10, fontWeight: 'bold', width: '90%'}]} placeholder={"Shopping List"}  autoCapitalize='sentences' autoCorrect={true} placeholderTextColor={Colors.gray}  keyboardType='default' onChangeText={setTitle} value={title}/>
+              <TextInput style={[styles.input, {fontSize: 20,borderRadius: 12,padding: 10, fontWeight: 'bold', width: '90%'}]} placeholder={(category == "Other")?"Shopping List":`${category} - List`}  autoCapitalize='sentences' autoCorrect={true} placeholderTextColor={Colors.gray}  keyboardType='default' onChangeText={setTitle} value={title}/>
               <TouchableOpacity style={{width: "10%"}} onPress={HandleMenuOpen}>
                 <Ionicons name={'ellipsis-vertical'} size={24} color={(!menuOpen)? Colors.gray: Colors.dark}/>
               </TouchableOpacity>

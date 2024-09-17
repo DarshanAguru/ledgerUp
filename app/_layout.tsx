@@ -70,7 +70,7 @@ const InitialLayout = () => {
   // Expo Router uses Error Boundaries to catch errors in the navigation tree
 
   useEffect(()=>{
-    const subs = AppState.addEventListener("blur",async()=>{if((pathName === "/home" || pathName === "/history" || pathName === "/analysis" || pathName === "/account") ) {router.push('/(modals)/white');} });
+    const subs = AppState.addEventListener("blur",async()=>{if((pathName === "/home" || pathName === "/history" || pathName === "/analysis") ) {router.push('/(modals)/white');} });
     const subs2 =  AppState.addEventListener("focus", async()=>{if (pathName==='/white'){  router.back();}});
     return ()=>{
       subs2.remove();

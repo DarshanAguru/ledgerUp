@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, Vibration, Alert} from 'react-native'
+import { View, Text, StyleSheet, Vibration, Alert, Modal} from 'react-native'
+import * as rn from 'react-native'
 import React, { useCallback,  useState } from 'react'
 import { useAuth, useUser } from '@clerk/clerk-expo'
 import Colors from '@/constants/Colors';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
-import { FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import {  Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useBalanceStore } from '@/store/balanceStore';
@@ -21,6 +22,8 @@ const Page = () => {
     const [lastName, settLastName] = useState("");
     const [userName , setUserName] = useState("");
     const [edit , setEdit] = useState(false);
+
+    const [isClearHistory, setClearHistory] = useState(false);
 
     const { deleteAllRemainders } = useRemaindersStore();
     const { clearTransactions } = useBalanceStore();
@@ -45,6 +48,12 @@ const Page = () => {
         }
     }
 
+    const modalComponent = (title:string,id:string)=>(
+        <rn.TouchableOpacity style={{padding:8, backgroundColor:"#fff", borderRadius: 8, borderColor: "#000", borderWidth:1}} onPress={()=>{Vibration.vibrate(10); handleClearHistory(id)}}>
+        <Text style={{fontSize: 18, fontWeight: "500", color: "#000",textAlign: "center"}}>{title}</Text>
+        </rn.TouchableOpacity>
+    )
+
     const handleLogOut =  async() => {
         Vibration.vibrate(10);
         Alert.alert("Sure Logout?", 
@@ -58,7 +67,7 @@ const Page = () => {
                 text: "Logout", 
                 onPress: async()=>{Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success) ;
                     await signOut(); 
-                    clearTransactions();
+                    clearTransactions("all time");
                     deleteAllRemainders();
                     deleteAllLists();
                     deleteAllCats();
@@ -69,8 +78,8 @@ const Page = () => {
 
     }
 
-    const handleClearHistory = () =>{
-        Alert.alert("Sure Clear History?","Please note that once history is cleared you can't retrieve it.",  [{
+    const handleClearHistory = (id:string) =>{
+        Alert.alert("Sure Clear History - "+id+"?","Please note that once history is cleared you can't retrieve it.",  [{
             text : "Cancel", 
             onPress: ()=>{Vibration.vibrate(10)}, 
             style: "cancel"
@@ -78,12 +87,13 @@ const Page = () => {
         {
             text: "Clear History", 
             onPress: async()=>{Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success) ;
-                clearTransactions();
-                Toast.show("History cleared successfully", Toast.SHORT);
+                clearTransactions(id);
+                setClearHistory(false);
+                Toast.show("History - " +id+ ", cleared successfully", Toast.SHORT);
             }
         }
     ])
-        clearTransactions();
+        
     }
 
     const handleAbout = () =>{
@@ -126,10 +136,21 @@ const Page = () => {
         }
 
         <View style={styles.optionsMenu}>
-            <TouchableOpacity style={styles.optionBtn} onPress={()=>handleClearHistory()}>
+            <TouchableOpacity style={styles.optionBtn} onPress={()=>{Vibration.vibrate(10); setClearHistory(true)}}>
             <MaterialCommunityIcons name={'broom'} size={22} color={'#000'} />
             <Text style={{color: '#000', fontSize: 20}}>Clear History</Text>
             </TouchableOpacity>
+            { isClearHistory && <Modal style={{width:"100%", height: "100%"}}>
+                <View style={{flexDirection: "column", justifyContent: "center",alignSelf: "center",width:"75%", height: "90%", gap:14, padding: 10}}>
+                    {modalComponent("This Week", "this week")}
+                    {modalComponent("This Month", "this month")}
+                    {modalComponent("All Time", "all time")}
+                    <rn.TouchableOpacity style={{padding:8, backgroundColor:"#fff", borderRadius: 8, borderColor: "#f00000", borderWidth:1}} onPress={()=>{Vibration.vibrate(10); setClearHistory(false)}}>
+                        <Text style={{fontSize: 18, fontWeight: "500", color: "#d00000", textAlign: "center"}}>Cancel</Text>
+                    </rn.TouchableOpacity>
+                </View>
+            </Modal>
+            }
             <TouchableOpacity style={styles.optionBtn} onPress={()=>handleLogOut()}>
                 <Ionicons  name={'log-out'} size={22} color={'#000'}/>
                 <Text style={{color: '#000', fontSize: 20}}>Logout</Text>

@@ -4,7 +4,7 @@ import {ScrollView, TextInput } from 'react-native-gesture-handler'
 import Colors from '@/constants/Colors'
 import { StatusBar } from 'expo-status-bar'
 import ColorPicker, {Preview,Panel2, Panel1, HueSlider, OpacitySlider} from 'reanimated-color-picker';
-
+import Toast from 'react-native-simple-toast';
 import { useCategoryStore } from '@/store/categoryListStore'
 import { useLocalSearchParams } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
@@ -22,7 +22,7 @@ const Page = () => {
 
     const [catName, setCatName] = useState("");
 
-    const [editId, setEditID] = useState("");
+    const [editId, setEditID] = useState("--");
 
     const [color,setColor] = useState("");
 
@@ -33,25 +33,34 @@ const Page = () => {
 
     const HandleNewCategory = () => {
         Vibration.vibrate(10);
-        addCat({name: "Category", color: Colors.dark, type: id});
-        setCatsList(cats.filter((cat:any)=>cat.type === id));
-        setEditID("Category");
-        setCatName("");
-        setColor("");
+        if(editId === "--")
+        {
+            const idcat = Math.random() + new Date().toISOString();
+            addCat({id: idcat, name: "Category", color: Colors.dark, type: id});
+            setCatsList(cats.filter((cat:any)=>cat.type === id));
+            setEditID(idcat);
+            setCatName("");
+            setColor("");
+        }
+        else{
+            Toast.show("Please add one category at a time", Toast.SHORT);
+        }
+      
 
     }
 
-    const handleDelete = (name:string)=>{
+    const handleDelete = (idcat:string)=>{
         Vibration.vibrate(10);
-        deleteCat(name);
+        deleteCat(idcat);
         setCatsList(cats.filter((cat:any)=>cat.type === id));
-        setEditID("");
+        setEditID("--");
+        setCatName("");
     }
 
-    const handleColor = (name:string)=>{
-        editCat(editId, {name: editId, color: color, type: id});
+    const handleColor = (idcat:string)=>{
+        editCat(idcat, {id: idcat, name: catName, color: color, type: id});
         setCatsList(cats.filter((cat:any)=>cat.type === id));
-        setEditID("");
+        setEditID("--");
         setCatName("");
     }
 
@@ -59,15 +68,26 @@ const Page = () => {
     const handleSubmit = (e:any)=>{
         if(e.nativeEvent.text.trim() !== "")
         {
-            editCat(editId, {name: catName, color: cats.find((cat:any)=>cat.name === editId)!.color!, type: id});
-            setCatsList(cats.filter((cat:any)=>cat.type === id));
-            setEditID("");
-            setCatName("");
+            if(catsList.find((cat:any)=>cat.name === catName) === undefined)
+            {
+                editCat(editId, {id: editId,name: catName, color: cats.find((cat:any)=>cat.id === editId)!.color!, type: id});
+                setCatsList(cats.filter((cat:any)=>cat.type === id));
+                setEditID("--");
+                setCatName("");
+
+            }
+            else{
+                Toast.show("Category name already exists", Toast.SHORT);
+                deleteCat(editId);
+                setCatsList(cats.filter((cat:any)=>cat.type === id));
+                setCatName("");
+                setEditID("--");
+            }
         }
         else{
-            editCat(editId, {name: editId, color: cats.find((cat:any)=>cat.name === editId)!.color!, type: id});
+            editCat(editId, {id: editId, name: catName, color: cats.find((cat:any)=>cat.id === editId)!.color!, type: id});
             setCatsList(cats.filter((cat:any)=>cat.type === id));
-            setEditID("");
+            setEditID("--");
             setCatName("");
         }
     }
@@ -97,19 +117,19 @@ const Page = () => {
         }
         {(catsList && catsList.length>0) && 
 
-        <ScrollView style={{backgroundColor: "#fff", padding:10, width:"100%", borderRadius: 16,maxHeight: "90%"}}>
+        <ScrollView style={{backgroundColor: "#fff", padding:10, width:"100%", borderRadius: 16,maxHeight: "92%"}}>
             <View style={styles.remaindersContainer}>
                 {
                     catsList.map((c:any,idx:number)=>(
                         <View key={idx} style={{flexDirection: "row",alignItems: "center", gap:10, width:"100%", marginBottom:20}}>
-                            <TouchableOpacity onPress={()=>{Vibration.vibrate(5);setCatName(c.name);(c.name === editId)?setEditID(""):setEditID(c.name)}}>
-                                <Ionicons name={"pencil"} color={(editId === c.name)?Colors.dark:Colors.lightGray} size={22}/>
+                            <TouchableOpacity onPress={()=>{Vibration.vibrate(5);setCatName(c.name);(c.id === editId)?setEditID("--"):setEditID(c.id)}}>
+                                <Ionicons name={"pencil"} color={(editId === c.id)?Colors.dark:Colors.lightGray} size={22}/>
                             </TouchableOpacity>
                         <View  style={[styles.editButton, {alignItems:"center"}]} >
-                            {(editId === c.name) && <TextInput style={{fontSize: 22,color: Colors.dark, fontWeight: 'bold', flex:1}} value={catName} onChangeText={setCatName} autoFocus autoCorrect placeholder='Category' keyboardType='default'  onSubmitEditing={handleSubmit}/>}
-                            {(editId !== c.name) && <Text style={{fontSize: 22,color: Colors.dark, fontWeight: 'bold', flex:1}}>{c.name}</Text>}
-                        <TouchableOpacity style={{width: "35%", borderRadius: 8,borderColor: "white", borderWidth: 2.5, height: 30, backgroundColor:c.color}} onPress={()=>{Vibration.vibrate(5);(editId === c.name)?setShowModal(true):setShowModal(false)}}/>
-        {(editId === c.name && showModal) && <Modal style={{width:"80%", height: "100%", justifyContent: "center", alignItems:"center"}}>
+                            {(editId === c.id) && <TextInput style={{fontSize: 22,color: Colors.dark, fontWeight: 'bold', flex:1}} value={catName} onChangeText={setCatName} autoFocus autoCorrect placeholder='Category' keyboardType='default'  onSubmitEditing={handleSubmit}/>}
+                            {(editId !== c.id) && <Text style={{fontSize: 22,color: Colors.dark, fontWeight: 'bold', flex:1}}>{c.name}</Text>}
+                        <TouchableOpacity style={{width: "35%", borderRadius: 8,borderColor: "white", borderWidth: 2.5, height: 30, backgroundColor:c.color}} onPress={()=>{Vibration.vibrate(5);(editId === c.id)?setShowModal(true):setShowModal(false)}}/>
+        {(editId === c.id && showModal) && <Modal style={{width:"80%", height: "100%", justifyContent: "center", alignItems:"center"}}>
         <ColorPicker value={c.color} adaptSpectrum={true} style={{alignSelf:"center", justifyContent:"center", paddingTop:"50%", width: '80%', gap:10 }} onComplete={onSelectColor}>
           <Preview  />
           <Panel1 />
@@ -121,14 +141,14 @@ const Page = () => {
                     <Text style={{fontSize: 20, fontWeight: "bold", color:Colors.dark}}>Cancel</Text>
         </TouchableOpacity>
                     <View style={{flex:1}}/>
-        <TouchableOpacity style={{marginVertical: 10, borderRadius: 12, borderWidth:1, paddingHorizontal:30, paddingVertical: 10, borderColor:"#00b000"}} onPress={() => {Vibration.vibrate(10);handleColor(c.name);setShowModal(false)}}>
+        <TouchableOpacity style={{marginVertical: 10, borderRadius: 12, borderWidth:1, paddingHorizontal:30, paddingVertical: 10, borderColor:"#00b000"}} onPress={() => {Vibration.vibrate(10);handleColor(c.id);setShowModal(false)}}>
                     <Text style={{fontSize: 20, fontWeight: "bold", color:Colors.dark}}>OK</Text>
         </TouchableOpacity>
         </View>
         </Modal>
 }
                     </View>
-                    <TouchableOpacity onPress={()=>{handleDelete(c.name)}}>
+                    <TouchableOpacity onPress={()=>{handleDelete(c.id)}}>
                     <Ionicons name={"trash-outline"} color={"#f00000"} size={22}/>
                     </TouchableOpacity>
                     </View>
@@ -145,8 +165,8 @@ const Page = () => {
     
     <View style={{flex:1}}></View>
     <View style={{alignItems: "center", width:"100%", justifyContent:"center", paddingVertical:14}}>
-    <TouchableOpacity style={styles.addButton} onPress={HandleNewCategory} >
-                    <Text style={{fontSize: 20, color: "#fff", fontWeight: '500'}}> + Add Category</Text>
+    <TouchableOpacity style={[styles.addButton, {backgroundColor: (editId === "--")?Colors.dark:Colors.lightGray}]} onPress={HandleNewCategory} >
+                    <Text style={{fontSize: 20, color: (editId === "--")?"#fff":Colors.gray, fontWeight: '500'}}> + Add Category</Text>
                 </TouchableOpacity> 
     </View>
     </View>

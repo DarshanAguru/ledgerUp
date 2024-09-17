@@ -28,7 +28,7 @@ export interface BalanceState{
     filterTransactions: (filters?:TransactionFilters)=>Array<Transaction>|null;
     balance: ()=>number;
     deleteTransaction : (id:string)=>void;
-    clearTransactions: ()=>void;
+    clearTransactions: (filter:string)=>void;
 }
 
 const daysDiff = (d1:string,d2:string)=>{
@@ -56,7 +56,7 @@ export const useBalanceStore = create<BalanceState>()(
                 {
                   if(filters.duration === "day")
                     {
-                        allTrans = allTrans.filter((trans)=>(new Date(trans.date).getDate() === new Date().getDate()));
+                        allTrans = allTrans.filter((trans)=>{ return  daysDiff(trans.date, new Date().toISOString()) <= 1});
                     }
                     else if (filters.duration === "week")
                         {
@@ -119,7 +119,21 @@ export const useBalanceStore = create<BalanceState>()(
             const totalExpense = allTrans.filter((trans)=>trans.type === "expense").reduce((acc,t)=>acc + t.amount, 0);
             return totalIncome - totalExpense;
         },
-        clearTransactions: ()=>{set({transactions: []})},
+        clearTransactions: (filter:string)=>{set((state)=>{
+            if(filter === "this week")
+            {
+                const allTransactions = state.transactions.filter((trans)=>daysDiff(trans.date, new Date().toISOString()) <= 7);
+                return {transactions: allTransactions}
+            }
+            else if (filter === "this month")
+            {
+                const allTransactions = state.transactions.filter((trans)=>daysDiff(trans.date, new Date().toISOString()) <= 30);
+                return {transactions: allTransactions}
+            }
+            else{
+                return {transactions: []}
+            }
+        })},
     }), {
         name: 'balance',
         storage:createJSONStorage(()=>zustandStorage),
