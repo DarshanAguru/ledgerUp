@@ -219,7 +219,6 @@ const InitialLayout = () => {
   <TouchableOpacity onPress={()=>{Vibration.vibrate(10);router.back()}}>
     <Ionicons name={'arrow-back'} size={26} color={'#000'} />
   </TouchableOpacity>
-  //@ts-ignore
 ), headerRight: ()=>(<TouchableOpacity  onPress={()=>{Vibration.vibrate(10);router.push({pathname: '/(authenticated)/cats/[id]', params: {id: "income"}})}}>
   <Text style={{fontSize: 14, fontWeight: '500'}}>
   Edit Categories
@@ -229,7 +228,6 @@ const InitialLayout = () => {
   <TouchableOpacity onPress={()=>{Vibration.vibrate(10);router.back()}}>
     <Ionicons name={'arrow-back'} size={26} color={'#000'} />
   </TouchableOpacity>
-  //@ts-ignore
 ), headerRight: ()=>(<TouchableOpacity  onPress={()=>{Vibration.vibrate(10);router.push({pathname: '/(authenticated)/cats/[id]', params: {id: "expense"}})}}>
   <Text style={{fontSize: 14, fontWeight: '500'}}>
   Edit Categories

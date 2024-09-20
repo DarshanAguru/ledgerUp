@@ -3,13 +3,13 @@ import { StyleSheet, View, Text, Vibration } from "react-native";
 
 
 import { MARGIN, SIZE } from "./Config";
-import { useBalanceStore } from "@/store/balanceStore";
+import { useBalanceStore } from "@/app/store/balanceStore";
 import Colors from "@/constants/Colors";
 import {  PieChart} from "react-native-gifted-charts";
 
 import {  useRouter } from "expo-router";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useCategoryStore } from "@/store/categoryListStore";
+import { useCategoryStore } from "@/app/store/categoryListStore";
 
 
 const styles = StyleSheet.create({

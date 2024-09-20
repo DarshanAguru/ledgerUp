@@ -9,20 +9,22 @@ import {  FontAwesome6, Ionicons } from '@expo/vector-icons';
 import WidgetList from '@/components/WidgetsTiles/WidgetList';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { StatusBar } from 'expo-status-bar';
-import { Link } from 'expo-router';
+import { Link, useFocusEffect } from 'expo-router';
 import { useCategoryStore } from '@/store/categoryListStore';
 
 
 const Page = () => {
 
   const { balance , transactions, deleteTransaction } = useBalanceStore();
+
+  const [transacs, setTrans] = useState<any>([]);
   
   const headerHeight = useHeaderHeight();
 
   const {getCatCol} = useCategoryStore();
 
 
-  useEffect(useCallback(()=>{
+  useFocusEffect(useCallback(()=>{
     const daysDiff = (d1:string,d2:string)=>{
       const date1 = new Date(d1).valueOf();
       const date2 = new Date(d2).valueOf(); 
@@ -34,7 +36,10 @@ const Page = () => {
     needToDelete.forEach((trans)=>{
       deleteTransaction(trans.id);
     });
-  },[]),[])
+
+    setTrans(transactions);
+  },[]))
+
 
 
 
@@ -81,9 +86,9 @@ const Page = () => {
         Recent Transactions
       </Text>
       <View style={styles.transactions}>
-        {transactions.length === 0 && <Text style={{padding: 8, color: Colors.gray}}>No Transactions yet</Text>}
+        {transacs.length === 0 && <Text style={{padding: 8, color: Colors.gray}}>No Transactions yet</Text>}
         {
-          transactions.length !== 0 && (transactions.sort((a,b)=>(new Date(b.date).valueOf() - new Date(a.date).valueOf())).slice(0,5).map((trans)=>{
+          transacs.length !== 0 && (transacs.sort((a:any,b:any)=>(new Date(b.date).valueOf() - new Date(a.date).valueOf())).slice(0,5).map((trans:any)=>{
             const date = new Date(trans.date);
             return (
               <View key = {trans.id} style={{flexDirection: 'row', marginBottom: 4,alignItems: 'center', gap:16}}>

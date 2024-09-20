@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Vibration, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Vibration, TouchableOpacity, Alert } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler'
@@ -30,7 +30,7 @@ const Page = () => {
 
     const { id } = useLocalSearchParams<{id:string}>();
 
-    const { editTransaction, transactions } = useBalanceStore();
+    const { editTransaction, transactions , deleteTransaction} = useBalanceStore();
 
     const {getAllExpenseCats, getAllIncomeCats} = useCategoryStore();
 
@@ -51,6 +51,22 @@ const Page = () => {
         res = res.replace("-","");
         res = res.replace(",","");
         setAmount(res);
+    }
+
+    const onDelete = ()=>{
+    Alert.alert("Sure Delete?", "Please note that this transaction will be deleted permanently.", [{
+        text : "Cancel", 
+        onPress: ()=>{Vibration.vibrate(10)}, 
+        style: "cancel"
+    }, 
+    {
+        text: "Delete", 
+        onPress: async()=>{Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success) ;
+            deleteTransaction(id);
+            router.back();
+        }
+    }
+    ])
     }
 
     const onSave = ()=>{
@@ -171,9 +187,14 @@ const Page = () => {
             </View>
         </View>
         <View style={{flex: 1}}/>
-        <TouchableOpacity style={[defaultStyles.pillButton,styles.enabled, {marginBottom: 20}]} onPress={onSave}>
+        <View style={{width:"100%",flexDirection: "row", gap: 5, padding:2}}>
+        <TouchableOpacity style={[defaultStyles.pillButton,styles.enabled, {marginBottom: 20, width:"50%"}]} onPress={onSave}>
         <Text style={defaultStyles.buttonText}>Save</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={[defaultStyles.pillButton,{backgroundColor: "#f00000",marginBottom: 20, width:"50%"}]} onPress={onDelete}>
+        <Text style={[defaultStyles.buttonText, {color:"white"}]}>Delete</Text>
+      </TouchableOpacity>
+        </View>
     </GestureHandlerRootView>
   )
 }

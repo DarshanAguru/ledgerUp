@@ -21,6 +21,7 @@ export interface TransactionFilters {
 
 export interface BalanceState{
     transactions: Array<Transaction>;
+    bal:number;
     getTotalExpenseThisMonth: () => number;
     getTotalIncomeThisMonth: () => number;
     editTransaction: (transaction: Transaction)=>void;
@@ -42,6 +43,7 @@ const daysDiff = (d1:string,d2:string)=>{
 export const useBalanceStore = create<BalanceState>()(
     persist((set,get)=>({
         transactions: [],
+        bal: 0,
         getTotalExpenseThisMonth: () => {
             return get().transactions.filter((trans)=>trans.type === "expense").filter((trans)=>(new Date(trans.date).getMonth() === new Date().getMonth())).reduce((acc,t)=>acc + t.amount, 0);
         },
@@ -86,15 +88,20 @@ export const useBalanceStore = create<BalanceState>()(
             set((state)=>{
                 let allTrans = state.transactions;
                 const index = allTrans.findIndex((trans)=>trans.id === transaction.id);
+                let newBal = state.bal;
                 if(index !== -1)
                 {
+                    newBal = newBal + ((allTrans[index].type === "income")?-allTrans[index].amount:allTrans[index].amount);
+                    newBal = newBal + ((transaction.type === "income")?transaction.amount:-transaction.amount);
                     allTrans[index] = transaction;
                 }
                 else{
+                    newBal = newBal + ((transaction.type === "income")?transaction.amount:-transaction.amount);
                     allTrans = [...allTrans, transaction];
                 }
                 const sortedTransactions = [...allTrans].sort((a,b)=> (new Date(b.id.split('@')[1]).valueOf() - new Date(a.id.split('@')[1]).valueOf()));
-                return {transactions: sortedTransactions}
+
+                return {transactions: sortedTransactions, bal : newBal};
             })
           
         },
@@ -102,36 +109,48 @@ export const useBalanceStore = create<BalanceState>()(
             set((state) => {
                 const allTransactions = [...state.transactions, transaction];
                 const sortedTransactions = [...allTransactions].sort((a,b)=> (new Date(b.id.split('@')[1]).valueOf() - new Date(a.id.split('@')[1]).valueOf()));
-                return {transactions: sortedTransactions} 
+                const newBal = state.bal + ((transaction.type === "income")?transaction.amount:-transaction.amount);
+                return {transactions: sortedTransactions,bal:newBal} 
             })
         },
         deleteTransaction: (id:string)=>{
             set((state)=>{
                 const allTransactions = [...state.transactions].filter((trans)=>trans.id !== id);
                 // const sortedTransactions = [...allTransactions].sort((a,b)=> (new Date(b.id.split('@')[1]).valueOf() - new Date(a.id.split('@')[1]).valueOf()));
-                return {transactions: allTransactions} 
+                const currTrans = [...state.transactions].filter((trans)=>trans.id === id)[0];
+                let newBal = state.bal;
+                if(daysDiff(currTrans.date, new Date().toISOString()) > 90)
+                {
+                    newBal = newBal;
+                }
+                else{
+                    newBal = newBal + ((currTrans.type === "income")?-currTrans.amount:currTrans.amount);
+                }
+                return {transactions: allTransactions, bal:newBal} 
             })
         },
         balance: ()=>{
-            const allTrans = get().transactions;
-            if(allTrans.length === 0) return 0;
-            const totalIncome = allTrans.filter((trans)=>trans.type === "income").reduce((acc,t)=>acc + t.amount, 0);
-            const totalExpense = allTrans.filter((trans)=>trans.type === "expense").reduce((acc,t)=>acc + t.amount, 0);
-            return totalIncome - totalExpense;
+            return get().bal;
         },
         clearTransactions: (filter:string)=>{set((state)=>{
             if(filter === "this week")
             {
-                const allTransactions = state.transactions.filter((trans)=>daysDiff(trans.date, new Date().toISOString()) <= 7);
-                return {transactions: allTransactions}
+                const allTransactions = state.transactions.filter((trans)=>daysDiff(trans.date, new Date().toISOString()) >= 7);
+                const thisWeekTrans = state.transactions.filter((trans)=>daysDiff(trans.date, new Date().toISOString()) <= 7);
+                const newBal = thisWeekTrans.reduce((acc,t)=>acc + ((t.type === "income")?-t.amount:t.amount), 0);
+                const updatedBal = state.bal + newBal;
+                return {transactions: allTransactions, bal:updatedBal}
             }
             else if (filter === "this month")
             {
-                const allTransactions = state.transactions.filter((trans)=>daysDiff(trans.date, new Date().toISOString()) <= 30);
-                return {transactions: allTransactions}
+                const allTransactions = state.transactions.filter((trans)=>daysDiff(trans.date, new Date().toISOString()) >= 30);
+                const thisMonthTrans = state.transactions.filter((trans)=>daysDiff(trans.date, new Date().toISOString()) <= 30);
+                const newBal = thisMonthTrans.reduce((acc,t)=>acc + ((t.type === "income")?-t.amount:t.amount), 0);
+                const updatedBal = state.bal + newBal;
+                return {transactions: allTransactions, bal : updatedBal}
             }
             else{
-                return {transactions: []}
+                return {transactions: [], bal:0}
             }
         })},
     }), {
