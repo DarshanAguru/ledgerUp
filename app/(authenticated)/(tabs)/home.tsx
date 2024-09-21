@@ -15,7 +15,7 @@ import { useCategoryStore } from '@/store/categoryListStore';
 
 const Page = () => {
 
-  const { balance , transactions, deleteTransaction } = useBalanceStore();
+  const { balance , transactions,filterTransactions, deleteTransaction } = useBalanceStore();
 
   const [transacs, setTrans] = useState<any>([]);
   
@@ -24,23 +24,33 @@ const Page = () => {
   const {getCatCol} = useCategoryStore();
 
 
+  const daysDiff = (d1:string,d2:string)=>{
+    const date1 = new Date(d1).valueOf();
+    const date2 = new Date(d2).valueOf(); 
+    const td = Math.abs(date2-date1);
+    const dd = Math.ceil(td/(1000*60*60*24));
+    return dd;
+}
+
+
+const getTrans = ()=>{
+  const res = filterTransactions({duration: "threeMonths"})?.sort((a:any,b:any)=>(new Date(b.date).valueOf() - new Date(a.date).valueOf())).slice(0,5);
+  return (!res)?[]:res;
+}
+
   useFocusEffect(useCallback(()=>{
-    const daysDiff = (d1:string,d2:string)=>{
-      const date1 = new Date(d1).valueOf();
-      const date2 = new Date(d2).valueOf(); 
-      const td = Math.abs(date2-date1);
-      const dd = Math.ceil(td/(1000*60*60*24));
-      return dd;
-  }
+
    const needToDelete = transactions.filter((trans)=>(daysDiff(trans.date, new Date().toISOString()) > 90))
-    needToDelete.forEach((trans)=>{
+   if(needToDelete !== undefined && needToDelete.length !== 0)
+   { needToDelete.forEach((trans)=>{
       deleteTransaction(trans.id);
     });
-
-    setTrans(transactions);
+  }
   },[]))
 
-
+  useFocusEffect(useCallback(()=>{
+    setTrans(getTrans());
+  },[]))
 
 
   const [editPressed, setEditPressed] = useState(false);
@@ -88,7 +98,7 @@ const Page = () => {
       <View style={styles.transactions}>
         {transacs.length === 0 && <Text style={{padding: 8, color: Colors.gray}}>No Transactions yet</Text>}
         {
-          transacs.length !== 0 && (transacs.sort((a:any,b:any)=>(new Date(b.date).valueOf() - new Date(a.date).valueOf())).slice(0,5).map((trans:any)=>{
+          transacs.length !== 0 && (transacs.map((trans:any)=>{
             const date = new Date(trans.date);
             return (
               <View key = {trans.id} style={{flexDirection: 'row', marginBottom: 4,alignItems: 'center', gap:16}}>
