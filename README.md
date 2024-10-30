@@ -27,9 +27,18 @@ or
 ```
 
 ## 🚀 About Me
-I'm a programming enthusiast, always curious to learn new things and try new technologies... I m currently pursuing my Bachelor in Technology in Information Technology. My interests are in full stack development, mobile development, and web development. I am passionate about building user-friendly and efficient software solutions that make a positive impact on people's lives.
 
+I'm a programming enthusiast, always curious to learn new things and try new technologies.. My interests are in full stack Dev and defensive security. 
 
+## 🛠 Skills
 
-## 📞 Contact
-If you have any questions or suggestions, feel free to contact me at agurudf@gmail.com
+- Programming Languages: Python, Java, C++
+- Frameworks: Django, React
+- Web Technologies: HTML, CSS, JS
+- Databases: MySQL, Oracle
+- Soft skills: Healthy communication, Smart Worker, quick learner, problem solver
+- OS: Windows, Linux, Mac
+
+## 🔗 Links
+
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/this-darshiii/)
