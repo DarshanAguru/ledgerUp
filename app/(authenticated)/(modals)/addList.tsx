@@ -137,11 +137,26 @@ const Page = () => {
     const HandleDataChange = (id:string,text:string)=>{
       
         let amount = 0;
-        const hasAmount = !isNaN(Number(text.trim().split("++")[1])) && (Number(text.trim().split("++")[1]) !==0)  
-        if(hasAmount)
+        const allLexes = text.trim().split(" ");
+        let hasAmount = false;
+        for(let i = 0; i < allLexes.length; i++)
         {
-          amount = Number(text.trim().split("++")[1]);
+          const lex = allLexes[i];
+          if(lex.startsWith("++"))
+          {
+            const val = lex.split("++")[1];
+            if(val.split(" ").length > 1)
+            {
+              amount += Number(val.split(" ")[0]);
+              hasAmount = true;
+            }
+            else{
+              amount += Number(val);
+              hasAmount = true;
+            }
+          }
         }
+        
         setAmounts((prev)=>({...prev, total: prev.total+amount}));
         setListItems((prev:any)=>(prev.map((item:any)=>item.id === id?{...item,hasAmount: hasAmount, amount: amount, data: text}:item)));
     }

@@ -5,7 +5,7 @@ import Colors from '@/constants/Colors'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useUser } from '@clerk/clerk-expo';
 import { Link, useFocusEffect } from 'expo-router'
-import { useBalanceStore } from '@/app/store/balanceStore'
+import { useBalanceStore } from '@/store/balanceStore'
 
 const HeaderTabs = () => {
 

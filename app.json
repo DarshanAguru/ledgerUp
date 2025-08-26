@@ -58,7 +58,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "Project ID"
+        "projectId": "<-- PROJECT ID -->"
       }
     }
   }
